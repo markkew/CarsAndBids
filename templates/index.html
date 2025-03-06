@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Car Auctions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .auction-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .auction-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .auction-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="">Cars and Bids</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto" style="max-width: 600px; width: 100%;">
+                    <input class="form-control me-2" type="search" placeholder="Search cars..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auctions">Auctions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/results">Past Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sell">Sell a Car</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                </ul>
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-outline-light" href="/logout">Logout</a>
+                {% else %}
+                    <a class="btn btn-outline-light" href="/login">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Cars And Bids</h1>
+            <p class="lead">Discover and bid and sell your dream cars</p>
+            <a href="#current-auctions" class="btn btn-primary btn-lg mt-3">View Current Auctions</a>
+        </div>
+    </section>
+
+    <!-- Featured Auctions -->
+    <section class="py-5 bg-light" id="current-auctions">
+        <div class="container">
+            <h2 class="text-center mb-5">Current Auctions</h2>
+            <div class="row g-4">
+                {% for car in cars %}
+                <div class="col-md-4">
+                    <div class="card auction-card">
+                        <img src="{{ car.image_url }}" class="card-img-top" alt="{{ car.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ car.name }}</h5>
+                            <p class="card-text">{{ car.description }}</p>
+                            <p class="card-text">Starting Bid: ${{ "%.2f"|format(car.starting_bid) }}</p>
+                            <a href="#" class="btn btn-primary">Place Bid</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="/auctions" class="btn btn-primary btn-lg">View More Auctions</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Cars and Bids</h5>
+                    <p>Your trusted platform for your favorite car auctions</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">About Us</a></li>
+                        <li><a href="#" class="text-white">Terms & Conditions</a></li>
+                        <li><a href="#" class="text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p>Email: info@carsandbids.com<br>Phone: (555) 123-4567</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

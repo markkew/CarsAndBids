@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+        }
+        
+        /* Add these new styles */
+        .card-img-container {
+            height: 200px;  /* Fixed height */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+        
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* This maintains aspect ratio while covering the container */
+        }
+
+        #auction-link {
+            border-radius: 10px;
+        }
+
+        #auction-link:hover {
+            transform: scale(1.03);
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head> 
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars and Bids</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto" style="max-width: 600px; width: 100%;">
+                    <input class="form-control me-2" type="search" placeholder="Search cars..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auctions">Auctions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/results">Past Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sell">Sell a Car</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                </ul>
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-outline-light" href="/logout">Logout</a>
+                {% else %}
+                    <a class="btn btn-outline-light" href="/login">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <section id="auctions" class="py-5 bg-dark">
+        <div class="container">
+            <div class="row">
+                <h1 class="text-light">Auctions</h1>
+            </div>
+            <div class="row">
+                {% for listing in listings %}
+                    <div class="col-md-4">
+                        <a href="/auctions/{{listing.id}}" class="text-decoration-none">
+                            <div class="card bg-secondary mb-3" id="auction-link">
+                                <div class="card-body">
+                                    <h2 class="card-title font-bold mb-3">{{listing.name}}</h2>
+                                    <div class="card-img-container mb-3">
+                                        {% if listing.image_urls %}
+                                            <img src="{{ url_for('static', filename=listing.image_urls.image_url) }}" alt="Car Image">
+                                        {% else %}
+                                            <p>No image available</p>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text text-light mb-2">{{listing.description}}</p>
+                                    <p class="card-text text-light mb-2">Starting Bid: ${{listing.starting_bid}}</p>
+                                    <p class="card-text text-light mb-2">Ending by: {{listing.end_datetime.strftime('%d %B %Y, %I:%M:%S %p')}}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</body> 
+</html>

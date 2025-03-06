@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 80vh;
+        }
+        
+        /* Add these new styles */
+        .card-img-container {
+            height: 200px;  /* Fixed height */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+        
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* This maintains aspect ratio while covering the container */
+        }
+
+        #auction-link {
+            border-radius: 10px;
+        }
+
+        #auction-link:hover {
+            transform: scale(1.03);
+            transition: transform 0.2s ease;
+        }
+
+        .carousel-item img {
+            height: 350px;  
+            width: 100%;
+            object-fit: contain;
+            background-color: grey;
+        }
+    </style>
+</head> 
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars and Bids</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <form class="d-flex mx-auto" style="max-width: 600px; width: 100%;">
+                    <input class="form-control me-2" type="search" placeholder="Search cars..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auctions">Auctions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/results">Past Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sell">Sell a Car</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                </ul>
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-outline-light" href="/logout">Logout</a>
+                {% else %}
+                    <a class="btn btn-outline-light" href="/login">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <section id="auctions" class="py-5 bg-dark">
+        <div class="container">
+            <div class="row">
+                <h2 class="text-light">{{listing.name}}</h2>
+                {% if listing.reserve_price %}
+                    <h6 class="text-info">Reserve Price: ${{listing.reserve_price}}</h6>
+                {% else %}
+                    <h6 class="text-info">No Reserve Price</h6>
+                {% endif %}
+                <h6 class="text-light">{{listing.description}}</h6>
+                <div id="image-gallery" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <!-- Carousel indicators -->
+                    <div class="carousel-indicators">
+                        {% for image in images %}
+                            <button type="button" 
+                                    data-bs-target="#image-gallery" 
+                                    data-bs-slide-to="{{ loop.index0 }}" 
+                                    {% if loop.first %}class="active"{% endif %}
+                                    aria-label="Slide {{ loop.index }}">
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Carousel items -->
+                    <div class="carousel-inner">
+                        {% for image in images %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ url_for('static', filename=image.image_url) }}" 
+                                     class="d-block w-100" 
+                                     alt="Car Image {{ loop.index }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Carousel controls -->
+                    {% if images|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#image-gallery" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#image-gallery" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    {% endif %}
+                </div>
+                <h3 class="text-info mb-3">Current Bid: ${{latest_bid}}</h3>
+                <h3 class="text-info">Time left: {{days_left}} days</h3>
+                <h6 class="text-light fst-italic mb-5">Ending at: {{listing.end_datetime.strftime('%d %B %Y, %I:%M:%S %p')}}</h6>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Milage:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{listing.mileage}} km</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Year:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{listing.year}}</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Make:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{listing.make}}</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Model:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{listing.model}}</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Colour:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{listing.colour}}</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <h6 class="text-light">Seller:</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-light">{{seller.username}}</h6>
+                    </div>
+                </div>
+                <div class="mx-auto mt-5" style="width: 80%;">
+                    <button class="btn btn-outline-light w-100 py-3">Bid Now</button>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body> 
+</html>
